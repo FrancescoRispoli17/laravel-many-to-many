@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Models\Technology;
 use App\Models\Type;
 use Illuminate\Support\Str;
 
@@ -26,7 +27,8 @@ class ProjectController extends Controller
     public function create()
     {
         $types = Type::all();
-        return view('admin.projects.create',compact('types'));
+        $technologies = Technology::all();
+        return view('admin.projects.create',compact('types','technologies'));
     }
 
     /**
@@ -45,6 +47,9 @@ class ProjectController extends Controller
         $project->type_id = $data['type_id'];
 
         $project->save();
+        if ($request->has('technologies')) {
+            $project->technologies()->attach($request->technologies);
+        }
         return redirect()->route('admin.projects.index')->with('message','creation done successfully');
     }
 
@@ -63,7 +68,8 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $types = Type::all();
-        return view('admin.projects.edit',compact('project','types'));
+        $technologies = Technology::all();
+        return view('admin.projects.edit',compact('project','types','technologies'));
     }
 
     /**
@@ -74,6 +80,12 @@ class ProjectController extends Controller
         $data = $request->all();
         $data['slug'] = Str::of($data['title'])->slug();
         $project->update($data);
+
+        if($request->has('technologies')){
+            $project->technologies()->sync($request->technologies);
+        }else{
+            $project->technologies()->detach();
+        }
 
         return redirect()->route('admin.projects.index');
     }

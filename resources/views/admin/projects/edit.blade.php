@@ -36,6 +36,23 @@
                         @endif
                     </div>
                     <div class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Technologies</label>
+                        <div>
+                            @foreach ($technologies as $technology)
+                            <div class="form-check form-check-inline">
+                                @if ($errors->any()) {
+                                <input class="form-check-input" type="checkbox" id="technology-{{ $technology->id }}" value="{{ $technology->id }}" name="technologies[]" {{ in_array($technology->id, old('technologies', old('$project->technologies'))) ? 'checked' : ''}}>
+                                <label class="form-check-label" for="technology-{{ $technology->id }}">{{ $technology->name }}</label>
+                                }
+                                @else
+                                <input class="form-check-input" type="checkbox" id="technology-{{ $technology->id }}" value="{{ $technology->id }}" name="technologies[]" {{ $project->technologies->contains($technology) ? 'checked' : ''}}>
+                                <label class="form-check-label" for="technology-{{ $technology->id }}">{{ $technology->name }}</label>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label for="exampleFormControlInput1" class="form-label">Cration date</label>
                         <input type="date" class="form-control @if ($errors->get('creation_date')) is-invalid @endif" id="exampleFormControlInput1" name="creation_date" value="{{ old('creation_date',$project->creation_date) }}">
                         @if ($errors->get('creation_date'))
